@@ -1,12 +1,6 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
+const { ethers, run } = require('hardhat');
 
-const { ethers } = require('hardhat');
-
-// global scope, and execute the script.
+// Deploy a contract
 const deploy = async (contractName, signer, args = []) => {
   const factory = await ethers.getContractFactory(contractName, signer);
   const contract = await factory.deploy(...args);
@@ -16,6 +10,14 @@ const deploy = async (contractName, signer, args = []) => {
   return contract;
 }
 
+// Verify a contract
+const verify = async (address, args = []) => {
+  await run('verify:verify', {
+    address: address,
+    constructorArguments: args,
+  }).catch((error) => { console.log(error); });
+}
+
 const main = async () => {
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
@@ -23,6 +25,8 @@ const main = async () => {
   const ERC6551Registry = await deploy('ERC6551Registry', deployer);
 
   console.log("ERC6551Registry deployed to:", ERC6551Registry.target);
+
+  await verify(ERC6551Registry.target);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
