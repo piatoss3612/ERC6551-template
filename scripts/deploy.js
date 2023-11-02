@@ -22,11 +22,17 @@ const main = async () => {
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
 
+  const ERC6551Account = await deploy('ERC6551Account', deployer);
+
+  console.log("ERC6551Account deployed to:", ERC6551Account.target);
+
   const ERC6551Registry = await deploy('ERC6551Registry', deployer);
 
   console.log("ERC6551Registry deployed to:", ERC6551Registry.target);
 
-  await verify(ERC6551Registry.target);
+  for (const obj of [{ contract: ERC6551Account }, { contract: ERC6551Registry }]) {
+    await verify(obj.contract.target, obj.contract.args || []);
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere
