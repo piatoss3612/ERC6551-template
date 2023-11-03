@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract SimpleNFT is ERC721, Ownable {
     constructor() ERC721("SimpleNFT", "SNFT") Ownable(msg.sender) {}
 
-    function safeMint(address to, uint256 tokenId) public onlyOwner {
+    function mint(address to, uint256 tokenId) public onlyOwner {
         _safeMint(to, tokenId);
     }
 }
