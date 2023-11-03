@@ -19,7 +19,7 @@ contract SimpleNFTScript is Script {
         // deploy SimpleNFT contract
         SimpleNFT nft = new SimpleNFT();
 
-        nft.safeMint(account, 1);
+        nft.mint(account, 1);
 
         vm.stopBroadcast();
     }
