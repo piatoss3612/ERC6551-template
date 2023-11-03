@@ -32,7 +32,7 @@ contract ERC6551RegistryTest is Test {
         assertEq(type(IERC6551Registry).interfaceId, bytes4(0xae3ec50e));
     }
 
-    function test_CreateAccount() public {
+    function test_createAccount() public {
         // mint a NFT to the sender
         token.mint(msg.sender, 1);
 
@@ -102,5 +102,34 @@ contract ERC6551RegistryTest is Test {
         assertEq(account.owner(), msg.sender);
 
         // TODO: test execute function
+    }
+
+    function test_createAccountFuzz(
+        address _implementation,
+        uint256 _chainId,
+        address _tokenAddress,
+        uint256 _tokenId,
+        bytes32 _salt
+    ) public {
+        address expected = registry.account(
+            _implementation,
+            _salt,
+            _chainId,
+            _tokenAddress,
+            _tokenId
+        );
+
+        address actual = registry.createAccount(
+            _implementation,
+            _salt,
+            _chainId,
+            _tokenAddress,
+            _tokenId
+        );
+
+        console.log("Expected:", expected);
+        console.log("Actual:", actual);
+
+        assertEq(actual, expected);
     }
 }
