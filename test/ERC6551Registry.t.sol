@@ -23,7 +23,7 @@ contract ERC6551RegistryTest is Test {
         assertEq(type(IERC6551Registry).interfaceId, bytes4(0xae3ec50e));
     }
 
-    function testCreateAccount() public {
+    function test_CreateAccount() public {
         uint256 chainId = 80001;
         address tokenContract = address(token);
         uint256 tokenId = 1;
