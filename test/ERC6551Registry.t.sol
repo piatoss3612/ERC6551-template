@@ -24,11 +24,22 @@ contract ERC6551RegistryTest is Test {
     }
 
     function test_CreateAccount() public {
-        uint256 chainId = 80001;
+        // mint a NFT to the sender
+        token.mint(msg.sender, 1);
+
+        assertEq(token.ownerOf(1), msg.sender);
+
+        // retrieve the chainId
+        uint chainId;
+        assembly {
+            chainId := chainid()
+        }
+
         address tokenContract = address(token);
         uint256 tokenId = 1;
         bytes32 salt = bytes32(uint256(1234));
 
+        // get the expected result of createAccount call
         address expected = registry.account(
             address(implementation),
             salt,
@@ -39,6 +50,7 @@ contract ERC6551RegistryTest is Test {
 
         console.log("Expected:", expected);
 
+        // call createAccount on the registry
         address actual = registry.createAccount(
             address(implementation),
             salt,
@@ -50,5 +62,24 @@ contract ERC6551RegistryTest is Test {
         console.log("Actual:", actual);
 
         assertEq(actual, expected);
+
+        // check the account is created correctly
+        ERC6551Account account = ERC6551Account(payable(actual));
+
+        (
+            uint256 actualChainId,
+            address actualTokenContract,
+            uint256 actualTokenId
+        ) = account.token();
+
+        assertEq(actualChainId, chainId);
+        assertEq(actualTokenContract, tokenContract);
+        assertEq(actualTokenId, tokenId);
+
+        console.log("Owner:", account.owner());
+
+        assertEq(account.owner(), msg.sender);
+
+        // TODO: test execute function
     }
 }
