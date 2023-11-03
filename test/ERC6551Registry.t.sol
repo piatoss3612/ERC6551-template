@@ -14,6 +14,15 @@ contract ERC6551RegistryTest is Test {
     ERC6551Account implementation;
     MockERC721 token;
 
+    event ERC6551AccountCreated(
+        address account,
+        address indexed implementation,
+        bytes32 salt,
+        uint256 chainId,
+        address indexed tokenContract,
+        uint256 indexed tokenId
+    );
+
     function setUp() public {
         registry = new ERC6551Registry();
         implementation = new ERC6551Account();
@@ -49,6 +58,18 @@ contract ERC6551RegistryTest is Test {
         );
 
         console.log("Expected:", expected);
+
+        // expect ERC6551AccountCreated event
+        vm.expectEmit(true, true, true, true);
+
+        emit ERC6551AccountCreated(
+            expected,
+            address(implementation),
+            salt,
+            chainId,
+            tokenContract,
+            tokenId
+        );
 
         // call createAccount on the registry
         address actual = registry.createAccount(
