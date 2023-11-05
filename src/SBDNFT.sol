@@ -54,6 +54,10 @@ contract SBDNFT is ERC721, ERC721Burnable, Ownable {
         // TODO: implement upgrade function
     }
 
+    function burn(uint256 tokenId) public virtual override onlyOwner {
+        _update(address(0), tokenId, address(0));
+    }
+
     function _setTokenURI(uint256 tokenId, Level level) internal virtual {
         _requireOwned(tokenId);
         _tokenURIs[tokenId] = dnftUri[uint256(level)];
