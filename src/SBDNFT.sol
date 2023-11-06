@@ -2,12 +2,13 @@
 pragma solidity ^0.8.22;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 error SoudBounded();
 
-contract SBDNFT is ERC721, ERC721Burnable, Ownable {
+contract SBDNFT is ERC721, ERC721Enumerable, ERC721Burnable, Ownable {
     enum Level {
         // TODO: clarify the levels by changing the names
         level1,
@@ -34,6 +35,12 @@ contract SBDNFT is ERC721, ERC721Burnable, Ownable {
     constructor(
         address owner
     ) ERC721("SoulBoundDynamicNFT", "SBDNFT") Ownable(owner) {}
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
 
     function tokenURI(
         uint256 tokenId
@@ -67,6 +74,21 @@ contract SBDNFT is ERC721, ERC721Burnable, Ownable {
         // TODO: implement get level function
     }
 
+    function _update(
+        address to,
+        uint256 tokenId,
+        address auth
+    ) internal virtual override(ERC721, ERC721Enumerable) returns (address) {
+        return super._update(to, tokenId, auth);
+    }
+
+    function _increaseBalance(
+        address account,
+        uint128 amount
+    ) internal virtual override(ERC721, ERC721Enumerable) {
+        super._increaseBalance(account, amount);
+    }
+
     /* 
         disable transfer and approve functions by overriding them with revert
         to make sure that the token is not transferable (soulbound)
@@ -75,7 +97,7 @@ contract SBDNFT is ERC721, ERC721Burnable, Ownable {
         address from,
         address,
         uint256
-    ) public virtual override {
+    ) public virtual override(IERC721, ERC721) {
         // _checkOnERC721Received(from, to, tokenId, data); is unreachable in safeTransferFrom function
         // so we need to check and pass the control flow to _checkOnERC721Received manually
         if (from != address(0)) {
@@ -83,11 +105,17 @@ contract SBDNFT is ERC721, ERC721Burnable, Ownable {
         }
     }
 
-    function approve(address, uint256) public virtual override {
+    function approve(
+        address,
+        uint256
+    ) public virtual override(IERC721, ERC721) {
         revert SoudBounded();
     }
 
-    function setApprovalForAll(address, bool) public virtual override {
+    function setApprovalForAll(
+        address,
+        bool
+    ) public virtual override(IERC721, ERC721) {
         revert SoudBounded();
     }
 }
